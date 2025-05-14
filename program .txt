@@ -1,0 +1,64 @@
+﻿import random
+import time
+
+
+class Sensor:
+    def __init__(self, name, threshold):
+        self.name = name
+        self.threshold = threshold
+        self.data = []
+
+
+    def read_value(self):
+        # Simulate sensor value
+        value = round(random.uniform(0, 100), 2)
+        self.data.append(value)
+        return value
+
+
+    def is_critical(self, value):
+        return value > self.threshold
+
+
+class StructuralHealthMonitor:
+    def __init__(self):
+        self.sensors = [
+            Sensor("Stress Sensor", threshold=70),
+            Sensor("Vibration Sensor", threshold=50),
+            Sensor("Displacement Sensor", threshold=30)
+        ]
+        self.log = []
+
+
+    def monitor_once(self):
+        alert = False
+        status_report = {}
+        for sensor in self.sensors:
+            value = sensor.read_value()
+            critical = sensor.is_critical(value)
+            status_report[sensor.name] = {
+                "value": value,
+                "status": "CRITICAL" if critical else "Normal"
+            }
+            if critical:
+                alert = True
+        self.log.append(status_report)
+        return status_report, alert
+
+
+    def run_monitoring(self, cycles=10, delay=1):
+        print("Starting Structural Health Monitoring...\n")
+        for i in range(cycles):
+            print(f"Cycle {i+1}:")
+            report, alert = self.monitor_once()
+            for name, status in report.items():
+                print(f"  {name}: {status['value']} - {status['status']}")
+            if alert:
+                print("!! WARNING: Critical condition detected !!")
+            print("-" * 40)
+            time.sleep(delay)
+
+
+if __name__ == "__main__":
+    shm = StructuralHealthMonitor()
+    shm.run_monitoring()
